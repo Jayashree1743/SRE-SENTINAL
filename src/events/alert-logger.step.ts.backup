@@ -1,0 +1,86 @@
+import type { EventConfig, Handlers } from '#/types'
+import { AlertDataSchema } from '../types/incidents.types'
+
+/**
+ * Basic Alert Logger (Event Step)
+ *
+ * Phase 1: Simple event handler that logs alerts
+ * Phase 2+: This will be replaced/supplemented by the AI RCA step
+ *
+ * Purpose:
+ * - Test the cron → event flow
+ * - Verify state management
+ * - Demonstrate event-driven architecture
+ *
+ * Features showcased:
+ * - Event subscription
+ * - Schema validation
+ * - State management
+ * - Logging
+ */
+export const config: EventConfig = {
+  name: 'AlertLogger',
+  type: 'event',
+  description: 'Logs incoming alerts and stores them in state',
+  subscribes: ['alert.detected'],
+  emits: [], // Phase 1: Just logging, Phase 2: Will emit to RCA
+  input: AlertDataSchema,
+  flows: ['sentinal-sre'],
+}
+
+export const handler: Handlers['AlertLogger'] = async (alert, { logger, state, traceId }) => {
+  logger.info('Alert received for processing', {
+    alertId: alert.id,
+    alertType: alert.alertType,
+    severity: alert.severity,
+    traceId,
+  })
+
+  try {
+    // Log alert details
+    logger.warn(`🚨 ALERT DETECTED: ${alert.alertType}`, {
+      severity: alert.severity,
+      metric: alert.metric,
+      currentValue: alert.currentValue,
+      threshold: alert.threshold,
+      affectedResource: alert.affectedResource,
+    })
+
+    // Log the diagnostic logs if available
+    if (alert.logs && alert.logs.length > 0) {
+      logger.info('Alert diagnostic logs:', {
+        logs: alert.logs,
+      })
+    }
+
+    // Store alert processing record
+    const processingRecord = {
+      alertId: alert.id,
+      receivedAt: new Date().toISOString(),
+      traceId,
+      status: 'logged',
+      alert,
+    }
+
+    await state.set('alert-processing', alert.id, processingRecord)
+
+    logger.info('Alert processing record stored', {
+      alertId: alert.id,
+      stateGroup: 'alert-processing',
+    })
+
+    // In Phase 1, we just log
+    // In Phase 2+, this step will be enhanced or replaced with AI RCA
+    logger.info('Alert logged successfully', {
+      alertId: alert.id,
+      nextStep: 'Phase 2 will add AI RCA here',
+    })
+  } catch (error) {
+    logger.error('Failed to process alert', {
+      alertId: alert.id,
+      error: error instanceof Error ? error.message : String(error),
+      traceId,
+    })
+    throw error // Re-throw to trigger retry mechanism
+  }
+}

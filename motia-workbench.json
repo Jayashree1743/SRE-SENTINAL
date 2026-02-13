@@ -1,0 +1,102 @@
+[
+  {
+    "id": "hello-world-flow",
+    "config": {
+      "src/hello/log-greeting.step.js": {
+        "x": 409,
+        "y": 44
+      },
+      "src/hello/hello-api.step.ts": {
+        "x": -414,
+        "y": -14,
+        "sourceHandlePosition": "right"
+      },
+      "src/hello/process_greeting_step.py": {
+        "x": -7,
+        "y": 28,
+        "sourceHandlePosition": "right"
+      }
+    }
+  },
+  {
+    "id": "sentinal-sre",
+    "config": {
+      "src\\policy\\safety-check.step.ts": {
+        "x": 681,
+        "y": 171
+      },
+      "src\\monitoring\\infrastructure-monitor.step.ts": {
+        "x": 0,
+        "y": 0
+      },
+      "src\\flows\\approval-gate.step.ts": {
+        "x": 1031,
+        "y": 245
+      },
+      "src\\execution\\verify-resolution.step.ts": {
+        "x": 1688,
+        "y": 338
+      },
+      "src\\execution\\execute-fix.step.ts": {
+        "x": 1381,
+        "y": 348
+      },
+      "src\\events\\send-slack-notification.step.ts": {
+        "x": 1073,
+        "y": 110
+      },
+      "src\\api\\trigger-alert.step.ts": {
+        "x": 10,
+        "y": 219
+      },
+      "src\\api\\slack-reject.step.ts": {
+        "x": 0,
+        "y": 422
+      },
+      "src\\api\\slack-approve.step.ts": {
+        "x": 1031,
+        "y": 400
+      },
+      "src\\api\\rollback.step.ts": {
+        "x": 19,
+        "y": 645
+      },
+      "src\\api\\manual-approval.step.ts": {
+        "x": 1031,
+        "y": 623
+      },
+      "src\\api\\logo.step.ts": {
+        "x": 43,
+        "y": 848
+      },
+      "src\\api\\list-pending-approvals.step.ts": {
+        "x": 52,
+        "y": 1051
+      },
+      "src\\api\\infrastructure-status.step.ts": {
+        "x": 37,
+        "y": 1254
+      },
+      "src\\api\\incidents-sse.step.ts": {
+        "x": 0,
+        "y": 1457
+      },
+      "src\\api\\incident-history.step.ts": {
+        "x": 36,
+        "y": 1680
+      },
+      "src\\api\\dashboard.step.ts": {
+        "x": 15,
+        "y": 1883
+      },
+      "src\\api\\clear-scenario.step.ts": {
+        "x": 62,
+        "y": 2086
+      },
+      "src\\ai\\root_cause_analysis_step.py": {
+        "x": 350,
+        "y": 181
+      }
+    }
+  }
+]

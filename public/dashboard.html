@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel - SRE Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Premium Dark Theme - High Contrast */
+            --color-bg-primary: #0A0A0A;
+            --color-bg-secondary: #141414;
+            --color-bg-tertiary: #1A1A1A;
+            --color-bg-elevated: #1F1F1F;
+
+            /* Text - Perfect Contrast */
+            --color-text-primary: #FFFFFF;
+            --color-text-secondary: #A1A1AA;
+            --color-text-tertiary: #71717A;
+            --color-text-disabled: #52525B;
+
+            /* Borders - Subtle but Clear */
+            --color-border-primary: #27272A;
+            --color-border-secondary: #3F3F46;
+            --color-border-focus: #52525B;
+
+            /* Accent - Single Premium Blue */
+            --color-accent: #3B82F6;
+            --color-accent-hover: #2563EB;
+            --color-accent-subtle: rgba(59, 130, 246, 0.1);
+
+            /* Status Colors - Refined */
+            --color-success: #10B981;
+            --color-success-bg: rgba(16, 185, 129, 0.1);
+            --color-warning: #F59E0B;
+            --color-warning-bg: rgba(245, 158, 11, 0.1);
+            --color-error: #EF4444;
+            --color-error-bg: rgba(239, 68, 68, 0.1);
+
+            /* Shadows - Depth */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+
+            /* Spacing System */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-border-secondary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-border-focus);
+        }
+
+        /* Layout */
+        .dashboard {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header - Premium Feel */
+        .header {
+            background: var(--color-bg-secondary);
+            border-bottom: 1px solid var(--color-border-primary);
+            padding: var(--space-lg) var(--space-xl);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: var(--color-accent-subtle);
+            border: 1px solid var(--color-border-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .brand-text h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .brand-text p {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            font-weight: 400;
+        }
+
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: 4px 10px;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--color-text-tertiary);
+            margin-left: var(--space-sm);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 8px 14px;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-success);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .refresh-btn {
+            padding: 8px 16px;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .refresh-btn:hover {
+            background: var(--color-bg-tertiary);
+            border-color: var(--color-border-secondary);
+            color: var(--color-text-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: var(--space-2xl);
+            width: 100%;
+        }
+
+        /* Cards - Premium Elevation */
+        .card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            border-color: var(--color-border-secondary);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .section-badge {
+            padding: 4px 10px;
+            background: var(--color-accent-subtle);
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Infrastructure Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .metric-card {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .metric-card:hover {
+            border-color: var(--color-border-secondary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-text-tertiary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .metric-value {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            letter-spacing: -0.02em;
+            line-height: 1;
+            margin-bottom: var(--space-sm);
+        }
+
+        .metric-subtext {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        .metric-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: var(--space-md);
+        }
+
+        .metric-status.healthy {
+            background: var(--color-success-bg);
+            color: var(--color-success);
+        }
+
+        .metric-status.warning {
+            background: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+
+        .metric-status.critical {
+            background: var(--color-error-bg);
+            color: var(--color-error);
+        }
+
+        /* Incidents Section */
+        .incidents-section {
+            margin-top: var(--space-2xl);
+        }
+
+        .incident-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .incident-card:hover {
+            border-color: var(--color-border-secondary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .incident-card.collapsed .incident-details {
+            display: none;
+        }
+
+        .incident-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--space-lg);
+        }
+
+        .incident-meta {
+            flex: 1;
+        }
+
+        .incident-id {
+            font-family: 'Monaco', monospace;
+            font-size: 11px;
+            color: var(--color-text-tertiary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .incident-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .expand-indicator {
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+            transition: transform 0.2s ease;
+        }
+
+        .incident-card.collapsed .expand-indicator {
+            transform: rotate(-90deg);
+        }
+
+        .severity-badge {
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .severity-badge.low {
+            background: var(--color-success-bg);
+            color: var(--color-success);
+        }
+
+        .severity-badge.medium {
+            background: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+
+        .severity-badge.high,
+        .severity-badge.critical {
+            background: var(--color-error-bg);
+            color: var(--color-error);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border-primary);
+            color: var(--color-text-secondary);
+        }
+
+        /* Incident Details */
+        .incident-details {
+            margin-top: var(--space-xl);
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--color-border-primary);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .detail-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-text-tertiary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-md);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            margin: var(--space-lg) 0;
+            overflow-x: auto;
+        }
+
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--color-text-tertiary);
+            white-space: nowrap;
+        }
+
+        .timeline-step.completed {
+            color: var(--color-text-primary);
+        }
+
+        .timeline-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-border-secondary);
+        }
+
+        .timeline-step.completed .timeline-dot {
+            background: var(--color-success);
+        }
+
+        .timeline-arrow {
+            color: var(--color-border-secondary);
+            font-size: 10px;
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .action-btn.primary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: var(--color-accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: var(--color-bg-elevated);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border-primary);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--color-bg-tertiary);
+            border-color: var(--color-border-secondary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-2xl) var(--space-xl);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-lg);
+            opacity: 0.4;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .empty-description {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: var(--space-xl);
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: var(--space-md);
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--space-md);
+            }
+
+            .main-content {
+                padding: var(--space-md);
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-value {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="brand">
+                    <div class="brand-icon">
+                        <img src="/image.png" alt="Sentinel" class="brand-logo" />
+                    </div>
+                    <div class="brand-text">
+                        <h1>Sentinel : The SRE<span class="version-badge"></span></h1>
+                        <p>Infrastructure Intelligence Platform</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="status-pill" id="connectionStatus">
+                        <span class="status-dot"></span>
+                        <span id="connectionText">Connecting...</span>
+                    </div>
+                    <button class="refresh-btn" onclick="location.reload()">
+                        ↻ Refresh
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Infrastructure Metrics -->
+            <div class="card">
+                <div class="section-header">
+                    <h2 class="section-title">Infrastructure Metrics</h2>
+                    <span class="section-badge">Real-time</span>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">CPU Usage</div>
+                        <div class="metric-value" id="cpuValue">0%</div>
+                        <div class="metric-subtext">Current load</div>
+                        <div class="metric-status healthy" id="cpuStatus">● Normal</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Memory</div>
+                        <div class="metric-value" id="memoryValue">0%</div>
+                        <div class="metric-subtext"><span id="memoryUsed">0</span> / <span id="memoryTotal">0</span> GB</div>
+                        <div class="metric-status healthy" id="memoryStatus">● Normal</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Disk Usage</div>
+                        <div class="metric-value" id="diskValue">0%</div>
+                        <div class="metric-subtext"><span id="diskUsed">0</span> / <span id="diskTotal">0</span> GB</div>
+                        <div class="metric-status healthy" id="diskStatus">● Normal</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Network</div>
+                        <div class="metric-value" id="networkValue">0ms</div>
+                        <div class="metric-subtext">Latency</div>
+                        <div class="metric-status healthy" id="networkStatus">● Normal</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incidents Section -->
+            <div class="incidents-section">
+                <div class="card">
+                    <div class="section-header">
+                        <h2 class="section-title">Incidents</h2>
+                        <span class="section-badge" id="incidentCount">0</span>
+                    </div>
+                    <div id="incidents"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { Stream } from '/@fs/home/sidharth/Desktop/Motia/BH/node_modules/@motiadev/stream-client-browser/dist/index.js';
+
+        const expandedIncidents = new Set();
+        let incidentSubscription = null;
+
+        function initializeRealtime() {
+            console.log('🚀 Initializing with Motia WebSocket streaming...');
+            fetchInfrastructureMetrics();
+            setInterval(fetchInfrastructureMetrics, 2000);
+
+            connectToIncidentStream();
+        }
+
+        async function fetchInfrastructureMetrics() {
+            try {
+                const response = await fetch('/infrastructure/status');
+                const data = await response.json();
+                if (data.metrics) {
+                    updateMetrics(data.metrics);
+                }
+            } catch (error) {
+                console.error('Failed to fetch metrics:', error);
+            }
+        }
+
+        function updateMetrics(metrics) {
+            // CPU
+            const cpu = Math.round(metrics.cpu.usage);
+            document.getElementById('cpuValue').textContent = cpu + '%';
+            updateStatusBadge('cpuStatus', cpu, 80);
+
+            // Memory
+            const memory = Math.round(metrics.memory.percentage);
+            const memUsed = (metrics.memory.used / 1024**3).toFixed(1);
+            const memTotal = (metrics.memory.total / 1024**3).toFixed(1);
+            document.getElementById('memoryValue').textContent = memory + '%';
+            document.getElementById('memoryUsed').textContent = memUsed;
+            document.getElementById('memoryTotal').textContent = memTotal;
+            updateStatusBadge('memoryStatus', memory, 60);
+
+            // Disk
+            const disk = Math.round(metrics.disk.percentage);
+            const diskUsed = (metrics.disk.used / 1024**3).toFixed(0);
+            const diskTotal = (metrics.disk.total / 1024**3).toFixed(0);
+            document.getElementById('diskValue').textContent = disk + '%';
+            document.getElementById('diskUsed').textContent = diskUsed;
+            document.getElementById('diskTotal').textContent = diskTotal;
+            updateStatusBadge('diskStatus', disk, 95);
+
+            // Network
+            const network = Math.round(metrics.network.latency);
+            document.getElementById('networkValue').textContent = network + 'ms';
+            updateStatusBadge('networkStatus', network, 200);
+        }
+
+        function updateStatusBadge(id, value, threshold) {
+            const badge = document.getElementById(id);
+            badge.className = 'metric-status';
+            if (value >= threshold) {
+                badge.classList.add('critical');
+                badge.textContent = '● Critical';
+            } else if (value >= threshold * 0.8) {
+                badge.classList.add('warning');
+                badge.textContent = '● Warning';
+            } else {
+                badge.classList.add('healthy');
+                badge.textContent = '● Normal';
+            }
+        }
+
+        function updateConnectionStatus(status, text) {
+            const textEl = document.getElementById('connectionText');
+            const dotEl = document.querySelector('.status-dot');
+
+            if (status === 'connected') {
+                dotEl.style.background = 'var(--color-success)';
+                textEl.textContent = text || 'Live (WebSocket)';
+            } else if (status === 'connecting') {
+                dotEl.style.background = 'var(--color-warning)';
+                textEl.textContent = text || 'Connecting...';
+            } else {
+                dotEl.style.background = 'var(--color-error)';
+                textEl.textContent = text || 'Disconnected';
+            }
+        }
+
+        function connectToIncidentStream() {
+            try {
+                // Determine WebSocket URL
+                const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${wsProtocol}//${window.location.host}`;
+
+                console.log(`📡 Connecting to Motia WebSocket: ${wsUrl}`);
+                updateConnectionStatus('connecting', 'Connecting...');
+
+                // Create Motia stream connection
+                const stream = new Stream(wsUrl);
+
+                // Subscribe to incident stream group
+                incidentSubscription = stream.subscribeGroup('incident', 'incidents');
+
+                console.log('✅ Subscribed to incident stream');
+
+                // Handle real-time updates
+                incidentSubscription.addChangeListener((incidents) => {
+                    console.log(`📥 Real-time update: ${incidents.length} incidents`);
+                    updateConnectionStatus('connected', 'Live (WebSocket)');
+                    renderIncidents(incidents || []);
+                });
+
+                console.log('🚀 WebSocket streaming active!');
+
+            } catch (error) {
+                console.error('❌ WebSocket connection failed:', error);
+                updateConnectionStatus('error', 'Connection Failed');
+
+                // Fallback to polling
+                console.log('⚠️ Falling back to polling...');
+                fallbackToPolling();
+            }
+        }
+
+        async function fallbackToPolling() {
+            async function poll() {
+                try {
+                    const response = await fetch('/incidents/history');
+                    const data = await response.json();
+                    renderIncidents(data.incidents || []);
+                    updateConnectionStatus('connected', 'Live (Polling)');
+                } catch (error) {
+                    console.error('Polling failed:', error);
+                }
+            }
+
+            poll();
+            setInterval(poll, 2000);
+        }
+
+        function renderIncidents(incidents) {
+            const container = document.getElementById('incidents');
+            document.getElementById('incidentCount').textContent = incidents.length;
+
+            if (incidents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">✓</div>
+                        <div class="empty-title">All Systems Operational</div>
+                        <div class="empty-description">No active incidents detected</div>
+                    </div>
+                `;
+                return;
+            }
+
+            incidents.sort((a, b) => {
+                const timeA = a.timestamps?.detected || a.lifecycle?.detected || 0;
+                const timeB = b.timestamps?.detected || b.lifecycle?.detected || 0;
+                return new Date(timeB) - new Date(timeA);
+            });
+
+            container.innerHTML = incidents.map(incident => {
+                const isExpanded = expandedIncidents.has(incident.id);
+                const timestamps = incident.timestamps || incident.lifecycle || {};
+
+                return `
+                    <div class="incident-card ${isExpanded ? '' : 'collapsed'}"
+                         data-incident-id="${incident.id}"
+                         onclick="toggleIncident('${incident.id}')">
+                        <div class="incident-header">
+                            <div class="incident-meta">
+                                <div class="incident-id">${incident.id}</div>
+                                <div class="incident-title">
+                                    <span>${formatAlertType(incident.alertType)}</span>
+                                    <span class="severity-badge ${incident.severity}">${incident.severity}</span>
+                                    <span class="expand-indicator">▼</span>
+                                </div>
+                            </div>
+                            <div class="status-badge">${incident.status.replace(/_/g, ' ')}</div>
+                        </div>
+
+                        ${isExpanded ? `
+                        <div class="incident-details">
+                            ${incident.rcaSummary ? `
+                                <div class="detail-row">
+                                    <div class="detail-label">Analysis</div>
+                                    <div class="detail-value">${incident.rcaSummary}</div>
+                                </div>
+                            ` : ''}
+
+                            ${incident.proposedFix ? `
+                                <div class="detail-row">
+                                    <div class="detail-label">Proposed Fix</div>
+                                    <div class="detail-value">${incident.proposedFix}</div>
+                                </div>
+                            ` : ''}
+
+                            ${timestamps.detected ? `
+                                <div class="detail-row">
+                                    <div class="detail-label">Timeline</div>
+                                    <div class="timeline">
+                                        <div class="timeline-step completed">
+                                            <span class="timeline-dot"></span>
+                                            <span>Detected</span>
+                                        </div>
+                                        <span class="timeline-arrow">→</span>
+                                        ${timestamps.analyzed ? `
+                                            <div class="timeline-step completed">
+                                                <span class="timeline-dot"></span>
+                                                <span>Analyzed</span>
+                                            </div>
+                                            <span class="timeline-arrow">→</span>
+                                        ` : ''}
+                                        ${timestamps.resolved ? `
+                                            <div class="timeline-step completed">
+                                                <span class="timeline-dot"></span>
+                                                <span>Resolved</span>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleIncident(incidentId) {
+            if (expandedIncidents.has(incidentId)) {
+                expandedIncidents.delete(incidentId);
+            } else {
+                expandedIncidents.add(incidentId);
+            }
+
+            const incidents = Array.from(document.querySelectorAll('.incident-card')).map(card => ({
+                id: card.dataset.incidentId
+            }));
+
+            // Re-render to update expansion state
+            startIncidentStream();
+        }
+
+        function formatAlertType(type) {
+            return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        initializeRealtime();
+    </script>
+</body>
+</html>

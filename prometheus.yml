@@ -1,0 +1,30 @@
+# Prometheus Configuration for Sentinal SRE Agent
+
+global:
+  scrape_interval: 15s  # How often to collect metrics
+  evaluation_interval: 15s  # How often to evaluate alerting rules
+
+# Scrape configurations - where to collect metrics from
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # System metrics (CPU, memory, disk, network)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'host-machine'
+
+  # Container metrics (Docker containers)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'docker-host'

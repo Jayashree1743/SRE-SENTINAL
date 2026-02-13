@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs ls:*)",
+      "WebSearch",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "WebFetch(domain:www.motia.dev)",
+      "Bash(docker ps:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)"
+    ]
+  }
+}

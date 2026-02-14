@@ -195,7 +195,7 @@ High memory alert → Sentinel runs `docker stats` → presents restart options 
 | 13 | **Polyglot** | TypeScript + Python | Optimal language per task |
 
 ---
-Demo Link : https://youtu.be/QEWtsZIajeY
+Demo Link : https://youtube.com/shorts/2S3X5FB3Mi8?si=REKLtKEeGlAWqRCO
 ---
 Example Real case workflow :
 
